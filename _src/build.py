@@ -360,14 +360,15 @@ def contact_list():
 
 
 def simple_form(subject='Website message'):
-    return f'''<form class="form" data-form data-subject="{subject}" data-email="{B['email']}" novalidate>
+    return f'''<form class="form" data-form data-post action="https://formsubmit.co/{B['email']}" method="POST" novalidate>
+    <input type="hidden" name="_subject" value="{subject} from the Faithful Rides website"><input type="hidden" name="_template" value="table"><input type="hidden" name="_captcha" value="false"><input type="hidden" name="_next" value="" data-next><input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
     <div class="field"><label for="f-name">Your name <span class="opt">(required)</span></label><input id="f-name" name="name" autocomplete="name" required></div>
     <div class="field"><label for="f-phone">Phone number <span class="opt">(required)</span></label><input id="f-phone" name="phone" type="tel" autocomplete="tel" required></div>
     <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email"></div>
     <div class="field"><label for="f-msg">Your message</label><textarea id="f-msg" name="message" rows="4"></textarea></div>
     <p class="form__err" role="alert" data-form-err></p>
     <button class="btn btn--primary btn--block" type="submit">Send message</button>
-    <p class="form__note">This opens your email app with your details filled in, ready to send.</p>
+    <p class="form__note">Your message goes straight to our office. Please don’t include medical records.</p>
   </form>'''
 
 
@@ -375,7 +376,8 @@ def ride_form():
     rides = ['Doctor’s appointments', 'Physical therapy', 'Dialysis', 'Chemotherapy or infusion', 'Lab work or tests', 'Hospital discharge',
              'Daily errands', 'Veteran transportation', 'Something else']
     opts = ''.join(f'<option>{r}</option>' for r in rides)
-    return f'''<form class="form form--ride" data-form data-subject="Ride request" data-email="{B['email']}" novalidate>
+    return f'''<form class="form form--ride" data-form data-post action="https://formsubmit.co/{B['email']}" method="POST" novalidate>
+    <input type="hidden" name="_subject" value="Ride request from the Faithful Rides website"><input type="hidden" name="_template" value="table"><input type="hidden" name="_captcha" value="false"><input type="hidden" name="_next" value="" data-next><input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
     <fieldset class="form__group"><legend>About you</legend>
       <div class="field-row">
         <div class="field"><label for="f-name">Your name <span class="opt">(required)</span></label><input id="f-name" name="name" autocomplete="name" required></div>
@@ -413,7 +415,7 @@ def ride_form():
     </fieldset>
     <p class="form__err" role="alert" data-form-err></p>
     <button class="btn btn--primary btn--block btn--lg" type="submit">Send ride request</button>
-    <p class="form__note">This opens your email app with your trip details filled in. Your ride is booked once we call you to confirm it.</p>
+    <p class="form__note">Your request goes straight to our office. Your ride is booked once we call you to confirm it.</p>
   </form>'''
 
 
@@ -741,11 +743,11 @@ def article(meta, data):
 
 def privacy():
     pg = Page('privacy-policy')
-    body = page_head(pg, 'Privacy policy', 'How this website handles your information. Last updated September 28, 2026.') + f'''
+    body = page_head(pg, 'Privacy policy', 'How this website handles your information. Last updated October 22, 2026.') + f'''
 <section class="sec sec--flush">
   <div class="wrap-narrow prose">
     <h2>What we collect</h2>
-    <p>This website does not collect personal information on its own. When you use our contact or ride request forms, your details are placed into an email in your own email app. Nothing is sent until you choose to send that email to {B['email']}.</p>
+    <p>When you send a ride request or message through this website, we receive the details you enter, such as your name, phone number, addresses and trip details. Forms are delivered to us by FormSubmit (formsubmit.co), a form-to-email service, which emails your submission to {B['email']}.</p>
     <p>If you call, email or send us a message, we use what you share only to respond to you and to arrange transportation.</p>
     <h2>Cookies and tracking</h2>
     <p>This website does not use advertising or tracking cookies. If you change the text size, your browser remembers that choice on your own device. You can clear it at any time in your browser settings.</p>
@@ -760,6 +762,20 @@ def privacy():
   </div>
 </section>'''
     return pg, shell(pg, 'Privacy Policy | Faithful Rides', 'How the Faithful Rides website handles your information.', body)
+
+
+def thank_you():
+    pg = Page('thank-you')
+    body = page_head(pg, 'Thank you', 'Your request was sent to Faithful Rides. We’ll call you soon to confirm the details.') + f'''
+<section class="sec sec--flush">
+  <div class="wrap-narrow prose">
+    <p class="big">Need to talk to someone now?</p>
+    <p>Call <a href="tel:{B['tel']}">{B['phone']}</a>. Our hours are {hours_html(' and ')}.</p>
+    <p><a class="btn btn--primary" href="{pg.u('')}">Back to the home page</a></p>
+  </div>
+</section>'''
+    h = shell(pg, 'Thank You | Faithful Rides', 'Your request was sent to Faithful Rides.', body)
+    return pg, h.replace('<meta name="description"', '<meta name="robots" content="noindex">\n<meta name="description"', 1)
 
 
 def not_found():
@@ -783,6 +799,7 @@ def write(pg, text):
 def main():
     data = json.load(open(os.path.join(ROOT, '_src', 'articles.json')))
     slugs = [write(*f()) for f in (home, services, about, schedule, contact, community, resources, privacy)]
+    write(*thank_you())
     for meta in ARTICLES:
         slugs.append(write(*article(meta, data[meta[0]])))
     open(os.path.join(ROOT, '404.html'), 'w').write(not_found())

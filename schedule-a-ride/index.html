@@ -65,7 +65,8 @@
 </section>
 <section class="sec sec--flush">
   <div class="wrap reqpage">
-    <div><form class="form form--ride" data-form data-subject="Ride request" data-email="contact@faithfulridesllc.com" novalidate>
+    <div><form class="form form--ride" data-form data-post action="https://formsubmit.co/contact@faithfulridesllc.com" method="POST" novalidate>
+    <input type="hidden" name="_subject" value="Ride request from the Faithful Rides website"><input type="hidden" name="_template" value="table"><input type="hidden" name="_captcha" value="false"><input type="hidden" name="_next" value="" data-next><input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
     <fieldset class="form__group"><legend>About you</legend>
       <div class="field-row">
         <div class="field"><label for="f-name">Your name <span class="opt">(required)</span></label><input id="f-name" name="name" autocomplete="name" required></div>
@@ -103,7 +104,7 @@
     </fieldset>
     <p class="form__err" role="alert" data-form-err></p>
     <button class="btn btn--primary btn--block btn--lg" type="submit">Send ride request</button>
-    <p class="form__note">This opens your email app with your trip details filled in. Your ride is booked once we call you to confirm it.</p>
+    <p class="form__note">Your request goes straight to our office. Your ride is booked once we call you to confirm it.</p>
   </form></div>
     <aside class="req__aside">
       <div class="req__card">

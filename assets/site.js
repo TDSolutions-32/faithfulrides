@@ -81,6 +81,25 @@
   $$('[data-form]').forEach((form) => {
     const err = $('[data-form-err]', form);
     form.addEventListener('submit', (e) => {
+      if (form.hasAttribute('data-post')) {
+        const name = form.elements.name, phone = form.elements.phone;
+        $$('input, select, textarea', form).forEach((el) => el.removeAttribute('aria-invalid'));
+        const missing = [name, phone].filter((el) => el && !el.value.trim());
+        if (missing.length) {
+          e.preventDefault();
+          missing.forEach((el) => el.setAttribute('aria-invalid', 'true'));
+          err.textContent = 'Please add your name and a phone number so we can call you back.';
+          missing[0].focus();
+          return;
+        }
+        err.textContent = '';
+        const next = $('[data-next]', form);
+        const js = document.querySelector('script[src*="assets/site.js"]');
+        if (next && js) next.value = new URL('../thank-you/', js.src).href; // site root = folder above /assets/
+        const btn = $('button[type=submit]', form);
+        if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+        return; // let the browser send the form to FormSubmit
+      }
       e.preventDefault();
       const f = Object.fromEntries(new FormData(form));
       const missing = ['name', 'phone'].filter((k) => !String(f[k] || '').trim());
